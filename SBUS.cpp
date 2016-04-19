@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "SBUS.h"
 
 void SBUS::begin() {
 	SBUS::begin(true);

@@ -2,35 +2,74 @@
 #define INFO_H
 
 //definition of Macro and types
-#define Speed double
-#define Angle double
 #define Power double
-enum direction {stay = -1, forward = 1, backward = 0};
 
-// information for the car's movement.
+enum Velocity  {v_x, v_y};								    			// have signs and scale.
+enum Angle     {sin_theta, cos_theta};
+enum Operation {opForward, opBackward, opLeft_shift, opRight_shift};    // remote control operation types.
+enum Direction {dStay = -1, dForward = 1, dBackward = 0, dUndefine = 2};// used in wheel control. use bit manipulation to reverse.
+
+/* information for the car's movement.
+ not doing normalization at this class. */
 class Info{
 public:
-	Info() = default;
-	Info(Speed sp, Angle a, direction d) {
-		if(Varified(sp, a, d)){
-			s = sp; angle = a; dir = d;
+	Info() { defaultSetup(); }
+	
+	Info(double* a_v, double* a_a, double w, Direction d = dUndefine) {
+		if(Varified(a_v, a_a, w, d)){
+			a_velocity = a_v; a_angle = a_a; omega = w; dir= d;
 		}else{
-			dir = stay;
-			s = angle = 0; //print error information.
+			defaultSetup();
+			//print error information.
+			Serial.println("Error angle range: sin theta " + 
+			a_a[sin_theta] + " " + " cos theta " + a_a[cos_theta]);
 		}
 	}
-	Speed     s;
-	Angle     angle;
-	direction dir;
+	
+	void      setDirection(Direction d) { dir = d; }
+	Direction  getDirection(Diection  d) { return dir; }
 private:
-	bool Varified(Speed sp, Angle a, direction dir){
-		if((sp >= 0 && sp <= 255)
-		&& (a >= -180 && a <= 180)
-		&& (dir == stay || dir == forward || dir == backward))
+	void defaultSetup() {
+		a_velocity[v_x] = 0; a_velocity[v_y] = 0;
+		a_angle[sin_theta] = 0; a_angle[cos_theta] = 1; // theta = 0;
+		omega = 0; 
+		dir = dUndefine;
+	}
+	
+	bool Varified(double* a_v, double* a_a, double w){
+		if(Varified(a_v) &&
+		   Varified(a_a) &&
+		   Varified(w))
 			return true;
 		else
 			return false;
 	}
+	
+	bool Varified(double* a_v){
+	/*	varify velocity value, underdevelop. */
+		return true;
+	}
+	bool Varified(double* a_v){
+	/*	varify angular velocity value, underdevelop. */
+		return true;
+	}
+	
+	//Verify triangular function
+	bool Varified(double* a_a){
+		if( (a_a[sin_theta] >= -1 && a_a[sin_theta] <= 1) && 
+			(a_a[cos_theta] >= -1 && a_a[cos_theta] <= 1) &&
+			(a_a[sin_theta] * a_a[sin_theta] + a_a[cos_theta]*a_a[cos_theta] == 1)
+	      )
+			return true;
+		else
+			return false;
+	}
+	
+	double*   a_velocity; // abstract concept. 
+	double*   a_angle; // 0 ~ 360
+	double    omega; /* abstract concept.angular speed, 
+						positive sign -> anti-clockwise. negative sign -> clockwise.*/
+	Direction dir;
 };
 
 #endif

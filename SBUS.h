@@ -1,7 +1,8 @@
 #ifndef SBUS_h
 #define SBUS_h
 
-#include "stdafx.h"
+#include "SBUS.h"
+#include <Arduino.h>
 
 #define SBUS_FAILSAFE_INACTIVE 0
 #define SBUS_FAILSAFE_ACTIVE   1

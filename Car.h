@@ -6,7 +6,7 @@
 //Overall control for the car.
 class Car{
 public:
-	Car() = default;
+	Car();
 	Car(int*); 
 	~Car();
 	
@@ -21,7 +21,7 @@ public:
 	bool Move(Info*); /* direct the car to move according to info
 						{Speed, Angle , direction} */
 						
-	void manualChange(int w, Speed sp); /* manually change the state of wheel */
+	bool manualChange(int w, Speed sp); /* manually change the state of wheel */
 	
 	double getSpeed() const { return sqrt(_v_y * _v_y + _v_x * _v_x); }
 	double getAngle() const { return omega; }

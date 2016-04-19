@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 #include "SBUS.h"
+#include "Info.h"
+
 class RemoteControl{
 public:
 	RemoteControl(HardwareSerial&, bool);
@@ -10,9 +12,10 @@ public:
 	bool receiveMsg();
 	Info* getCurrentState() const { return info; }
 private:
-	void convert();
+	void convert(operation, int);
 	SBUS*     pSBUS;
 	Info*     info;
+	int*      parameters; //s_x, s_y;
 };
 
 #endif

@@ -1,14 +1,18 @@
-#include "stdafx.h"
+#include "Car.h"
 
 Car::Car(){
 	r = 1;
-	_R = new int[4][3]; // all zero matrix.
+	_R = new double*[3]; // all zero matrix.
+	for(int i = 0; i < 3; i++)
+		_R[i] = new double[4];
 	bSetup = false;
 }
 
 Car::Car(int* pins) {
 	r = 1;
-	_R = new int[4][3]; // all zero matrix.
+		_R = new double*[3]; // all zero matrix.
+	for(int i = 0; i < 3; i++)
+		_R[i] = new double[4];
 	
 	setPins(pins);
 					
@@ -16,21 +20,21 @@ Car::Car(int* pins) {
 }
 
 void Car::setPins(int* pins){
-	wheelGroup = { new Wheel(pins[0], pins[1]), 
-				   new Wheel(pins[2], pins[3]), 
-				   new Wheel(pins[4], pins[5]), 
-				   new Wheel(pins[6], pins[7])
-				   };  	//initialize four wheels.	
+	wheelGroup = new Wheel*[4];
+	
+	for(int i = 0; i <= 3; i++){
+		wheelGroup[i] -> setPinMode(pins[3*i], pins[3*i+1], pins[3*i+2]);
+	}				   //initialize four wheels.	
 }
 
 // setup _R and r
-void Car::ParameterSetup(double r,
+void Car::ParameterSetup(double _r,
 						 double l1, double l2, double l3, double l4,
 						 double theta1,double theta2, double theta3, double theta4,
 						 double alpha1, double alpha2, double alpha3, double alpha4,
 						 double beta1, double beta2, double beta3, double beta4)
 {
-	this.r = r;
+	r = _r;
 	
 	_R[0][0] = cos(theta1 - alpha1) / sin(alpha1) ;
 	_R[0][1] = sin(theta1 - alpha1) / sin(alpha1) ;
@@ -48,10 +52,10 @@ void Car::ParameterSetup(double r,
 	bSetup = true;
 }
 // am simplified version for parameterSetup.
-void Car::ParameterSetup(double r, 
+void Car::ParameterSetup(double _r, 
 					    double p1, double p2, double p3, double p4)
 {
-	this.r = r; 
+	r = _r; 
 	for(int z = 0; z <= 1; z++){
 		for(int i = 0; i <= 1; i++)
 			for(int j = 0; j <= 1; j++)
@@ -71,12 +75,21 @@ double Car::calcSpeed(int i){
 	return w_i;
 }
 
-bool Car::move(Info* info){
+bool Car::Move(Info* info){
 	if(bSetup){
 		//constants used in R
-		_v_y = sin(info->s);
+	/*	_v_y = sin(info->s);
 		_v_x = cos(info->s);
 		omega = info->angle;
+	*/
+/*		if(info->dir == forward || info->dir == backward){
+			_v_x = 0; _v_y = info->s;
+			omega = 0;
+		}
+		if(info->dir == translation || info->dir == translation){
+			_v_x = info->s; _v_y = 0;
+			omega = 0;
+		}
 		//speed for each wheel
 		double _w_1 = calcSpeed(1);
 		double _w_2 = calcSpeed(2);
@@ -87,6 +100,34 @@ bool Car::move(Info* info){
 		wheelGroup[1] -> move(_w_2);
 		wheelGroup[2] -> move(_w_3);
 		wheelGroup[3] -> move(_w_4);
+	*/
+		switch(info->dir){
+			case forward:
+				wheelGroup[0] -> move(info->s, true); // 转动 正 反 true false
+				wheelGroup[1] -> move(info->s, true);
+				wheelGroup[2] -> move(info->s, true);
+				wheelGroup[3] -> move(info->s, true);
+				break;
+			case backward:
+				wheelGroup[0] -> move(info->s, false);
+				wheelGroup[1] -> move(info->s, false);
+				wheelGroup[2] -> move(info->s, false);
+				wheelGroup[3] -> move(info->s, false);
+				break;
+			case rtranslation:
+				wheelGroup[0] -> move(info->s, false);
+				wheelGroup[1] -> move(info->s, true);
+				wheelGroup[2] -> move(info->s, true);
+				wheelGroup[3] -> move(info->s, false);
+				break;
+			case ltranslation:
+				wheelGroup[0] -> move(info->s, true);
+				wheelGroup[1] -> move(info->s, false);
+				wheelGroup[2] -> move(info->s, false);
+				wheelGroup[3] -> move(info->s, true);
+				break;
+		
+		}
 		
 		return true;
 	}
@@ -96,7 +137,7 @@ bool Car::move(Info* info){
 
 bool Car::manualChange(int w, Speed sp){
 	if(w >= 0 && w <= 3){
-		wheelGroup[w] -> move(sp);
+		wheelGroup[w] -> move(sp, true); // need revise later
 		return true;
 	}
 	else{
