@@ -6,18 +6,18 @@
 //control wheel.
 class Wheel{
 public:
-	Wheel() : dir(stay), sp(0), D1(1), D2(2), P1(3) {}
+	Wheel() : dir(dStay), sp(0), D1(1), D2(2), P1(3) {}
 	Wheel(int, int, int);
 	~Wheel() = default;
 	void      setPins(int, int, int);  //set/change two pin number for output.
-	void      move(Speed s, bool bforward);
+	void      move(double);
 	void      setPinMode(int, int, int);  // set Wheel pin modes
-	bool      stop() { move(0, 0); }
-	direction getDir() const { return dir; }
-	Speed     getSp() const { return sp; }
+	bool      stop() { move(0); }
+	Direction getDir() const { return dir; }
+	double     getSp() const { return sp; }
 private:
-	direction dir;
-	Speed     sp; // 0 ~ 255
+	Direction dir;
+	double     sp; // 0 ~ 255
 	int       D1;
 	int       D2;
 	int       P1;

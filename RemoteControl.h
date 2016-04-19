@@ -12,10 +12,11 @@ public:
 	bool receiveMsg();
 	Info* getCurrentState() const { return info; }
 private:
-	void convert(operation, int);
+	void      convert(Operation, int);
 	SBUS*     pSBUS;
 	Info*     info;
-	int*      parameters; //s_x, s_y;
+	int*      a_velocity; //v_x, v_y;
+	double*   a_angle; //sin_theta, cos_theta;
 };
 
 #endif

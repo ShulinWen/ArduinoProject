@@ -69,8 +69,8 @@ void Car::ParameterSetup(double _r,
 
 //assistance for calculating w_i 
 double Car::calcSpeed(int i){
-	double w_i = - ( 1 / r ) * ( _R[i-1][0] * _v_x 
-								 +_R[i-1][1] * _v_y
+	double w_i = - ( 1 / r ) * ( _R[i-1][0] * a_velocity[v_x] 
+								 +_R[i-1][1] *  a_velocity[v_y]
 								 +_R[i-1][2] * omega);
 	return w_i;
 }
@@ -78,18 +78,9 @@ double Car::calcSpeed(int i){
 bool Car::Move(Info* info){
 	if(bSetup){
 		//constants used in R
-	/*	_v_y = sin(info->s);
-		_v_x = cos(info->s);
-		omega = info->angle;
-	*/
-/*		if(info->dir == forward || info->dir == backward){
-			_v_x = 0; _v_y = info->s;
-			omega = 0;
-		}
-		if(info->dir == translation || info->dir == translation){
-			_v_x = info->s; _v_y = 0;
-			omega = 0;
-		}
+		a_velocity = info->getVelocity();
+		a_angle    = info->getAngle();
+		omega = 1;
 		//speed for each wheel
 		double _w_1 = calcSpeed(1);
 		double _w_2 = calcSpeed(2);
@@ -100,34 +91,7 @@ bool Car::Move(Info* info){
 		wheelGroup[1] -> move(_w_2);
 		wheelGroup[2] -> move(_w_3);
 		wheelGroup[3] -> move(_w_4);
-	*/
-		switch(info->dir){
-			case forward:
-				wheelGroup[0] -> move(info->s, true); // 转动 正 反 true false
-				wheelGroup[1] -> move(info->s, true);
-				wheelGroup[2] -> move(info->s, true);
-				wheelGroup[3] -> move(info->s, true);
-				break;
-			case backward:
-				wheelGroup[0] -> move(info->s, false);
-				wheelGroup[1] -> move(info->s, false);
-				wheelGroup[2] -> move(info->s, false);
-				wheelGroup[3] -> move(info->s, false);
-				break;
-			case rtranslation:
-				wheelGroup[0] -> move(info->s, false);
-				wheelGroup[1] -> move(info->s, true);
-				wheelGroup[2] -> move(info->s, true);
-				wheelGroup[3] -> move(info->s, false);
-				break;
-			case ltranslation:
-				wheelGroup[0] -> move(info->s, true);
-				wheelGroup[1] -> move(info->s, false);
-				wheelGroup[2] -> move(info->s, false);
-				wheelGroup[3] -> move(info->s, true);
-				break;
-		
-		}
+	
 		
 		return true;
 	}
@@ -135,9 +99,9 @@ bool Car::Move(Info* info){
 		return false;
 }
 
-bool Car::manualChange(int w, Speed sp){
+bool Car::manualChange(int w, int sp){
 	if(w >= 0 && w <= 3){
-		wheelGroup[w] -> move(sp, true); // need revise later
+		wheelGroup[w] -> move(sp); // need revise later
 		return true;
 	}
 	else{

@@ -13,22 +13,29 @@ void Wheel::setPinMode(int d1, int d2, int p1){
 	pinMode(p1, OUTPUT);
 }
 
-void Wheel::move(Speed s, bool bforward){
-	sp = s;
-	if( s == 0 ) {
+void Wheel::move(double velocity){
+	if(velocity < 0) {
+		dir = dBackward;
+		sp = -velocity;
+	}else{
+		dir = dForward;
+		sp = velocity
+	}
+	
+	if( sp == 0 ) {
 		dir = stay;
 		return;
 	}
-	else
-		dir = (direction)(bforward ? 1 : 0 ); // forward 
-	if(bforward){
+	
+	if(dForward){
 		digitalWrite(D1, HIGH);
 		digitalWrite(D2, LOW);
 	}else{
 		digitalWrite(D1, LOW);
 		digitalWrite(D2, HIGH);
 	}
-	analogWrite(P1, s);
+	if(sp > 255) sp = 255;
+		analogWrite(P1, sp);
 }
 
 void Wheel::setPins(int d1, int d2, int p1){

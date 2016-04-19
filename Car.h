@@ -21,20 +21,20 @@ public:
 	bool Move(Info*); /* direct the car to move according to info
 						{Speed, Angle , direction} */
 						
-	bool manualChange(int w, Speed sp); /* manually change the state of wheel */
+	bool manualChange(int w, int v); /* manually change the state of wheel */
 	
-	double getSpeed() const { return sqrt(_v_y * _v_y + _v_x * _v_x); }
-	double getAngle() const { return omega; }
+	double* getVelocity() const { return a_velocity; }
+	double* getAngle() const { return a_angle; }
 					  
 private:
-	double      calcSpeed(int i);
+	double    calcSpeed(int i);
 	Wheel     **wheelGroup; 	//an Array to store the pointers of the four wheels
 	double    **_R; //only for the matrix, it is not R
 	double    r;   //default r = 1
-	double    _v_y; // car's speed in y axis. (m/s)
-	double    _v_x;
-	double    omega; // car's rotation angle. (-180~180);
+	int*      a_velocity; // car's velocity with sign. (double)
+	double*   a_angle; 
 	bool      bSetup; // check for setup of parameters.
+	double    omega;  // car's rotation angular speed;
 };
 
 #endif

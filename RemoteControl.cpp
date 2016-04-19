@@ -2,8 +2,8 @@
 RemoteControl::RemoteControl(HardwareSerial& serial, bool bTimer){
 	pSBUS = new SBUS(serial);
 	info = new Info();
-	//set initial speed data
-	parameters = new int[2];
+	//set initial velocity data
+	a_velocity = new int[2];
 	
 	pSBUS->begin(bTimer);
 }
@@ -12,13 +12,13 @@ bool RemoteControl::receiveMsg(){
 	
 	//use convert to set Info*
 	if(pSBUS->getNormalizedChannel(2) < 0)
-		convert(opfward, pSBUS->getNormalizedChannel(2)); // [-90 ~ 0)
+		convert(opForward, pSBUS->getNormalizedChannel(2)); // [-90 ~ 0)
 	if(pSBUS->getNormalizedChannel(2) >= 0)
-		convert(opbward, pSBUS->getNormalizedChannel(2)); // [0 ~ 69]
-//	if(pSBUS->getNormalizedChannel(1) < 0)
-//		convert(left_shift, pSBUS->getNormalizedChannel(1)); // [-65 ~ 0)
-//	if(pSBUS->getNormalizedChannel(1) >=0)
-//		convert(right_shift, pSBUS->getNormalizedChannel(1)); // [0 ~ 68]
+		convert(opBackward, pSBUS->getNormalizedChannel(2)); // [0 ~ 69]
+	if(pSBUS->getNormalizedChannel(1) < 0)
+		convert(opLeft_shift, pSBUS->getNormalizedChannel(1)); // [-65 ~ 0)
+	if(pSBUS->getNormalizedChannel(1) >=0)
+		convert(opRight_shift, pSBUS->getNormalizedChannel(1)); // [0 ~ 68]
 	
 }
 
@@ -29,23 +29,21 @@ void RemoteControl::convert(operation op, int v){
 	information { speed, direction, angle };
 	*/
 	switch(op){
-		case opfward:
-			parameters[s_y] = map(v, -90, 0, 0, 255);
-			info->dir = forward;
+		case opForward:
+			a_velocity[v_y] = map(-v, 0, 90, 0, 255);
 			break;
-		case opbward:
-			parameters[s_y] = map(v, 0, 69, 0, 255);
-			info->dir = backward;
+		case opBackward:
+			a_velocity[v_y] = -map(v, 0, 69, 0, 255);
 			break;
-		case left_shift:
-			parameters[s_x] = map(v, -65, 0, 0, 255);
-			info->dir = ltranslation;
+		case opLeft_shift:
+			a_velocity[v_x] = -map(-v, 0, 65, 0, 255);
 			break;
-		case right_shift:
-			parameters[s_y] = map(v, 0, 68, 0, 255);
-			info->dir = rtranslation;
+		case opRight_shift:
+			a_velocity[v_x] = map(v, 0, 68, 0, 255);
 			break;
 	}
-	
-	info->s = sqrt(parameters[s_x]*parameters[s_x] + parameters[s_y]*parameters[s_y]);
+	angle[sin_theta] = a_velocity[v_y] / sqrt( a_velocity[v_y] * a_velocity[v_y] + a_velocity[v_x] * a_velocity[v_x]);
+	angle[cos_theta] = a_velocity[v_x] / sqrt( a_velocity[v_y] * a_velocity[v_y] + a_velocity[v_x] * a_velocity[v_x]);
+	info->setVelocity(a_velocity);
+	info->setAngle(angle);
 }
